@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#03040d" />
+  <meta name="description" content="A cinematic personalised Diwali journey through a black hole and wormhole." />
+  <title>Diwali — Beyond the Event Horizon | V5.7</title>
+  <style>
+    :root { color-scheme:dark; --gold:#ffdfa5; --gold2:#ffb85e; --ink:#03040d; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; width:100%; height:100%; overflow:hidden; background:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+    #scene { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+    .vignette { position:fixed; inset:0; z-index:2; pointer-events:none; background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,8,.48) 100%); }
+    .grain { position:fixed; inset:0; z-index:3; pointer-events:none; opacity:.045; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); }
+    #cinematic-overlay { position:fixed; inset:0; z-index:4; pointer-events:none; opacity:0; background:radial-gradient(ellipse at 50% 48%,rgba(23,34,82,.08),rgba(4,7,28,.34) 78%,rgba(1,2,12,.5)); } 
+    #sceneCaption { position:fixed; z-index:5; top:13vh; left:50%; width:min(92%,760px); transform:translateX(-50%); color:rgba(255,229,190,.92); text-align:center; text-transform:uppercase; letter-spacing:.23em; font-size:clamp(9px,1.35vw,12px); line-height:1.8; text-shadow:0 0 22px rgba(255,177,94,.65); opacity:0; transition:opacity 1.2s ease; pointer-events:none; }
+    #sceneCaption.show { opacity:1; }
+    .screen { position:fixed; inset:0; z-index:8; display:flex; align-items:center; justify-content:center; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); transition:opacity 1s ease,transform 1s ease; }
+    .hidden { opacity:0!important; pointer-events:none!important; transform:scale(1.035); }
+    .intro-card { width:min(560px,100%); text-align:center; padding:clamp(24px,5vw,43px); border:1px solid rgba(255,205,127,.24); border-radius:28px; background:linear-gradient(145deg,rgba(13,16,39,.82),rgba(12,8,28,.58)); box-shadow:0 20px 90px rgba(0,0,0,.48),inset 0 0 50px rgba(255,184,91,.045); backdrop-filter:blur(15px); }
+    .eyebrow { color:#d5b98c; text-transform:uppercase; letter-spacing:.24em; font-size:10px; font-weight:700; }
+    h1 { color:#fff2d8; font-family:Georgia,"Times New Roman",serif; font-weight:500; font-size:clamp(36px,8vw,64px); line-height:1.02; margin:16px 0 27px; text-shadow:0 0 34px rgba(255,185,91,.3); }
+    .sub { color:#c7c5d8; font-size:14px; line-height:1.7; max-width:430px; margin:0 auto 24px; }
+    .name-wrap { display:flex; gap:9px; margin:0 auto 13px; max-width:410px; }
+    input { min-width:0; flex:1; padding:14px 15px; color:#fff4df; background:rgba(255,255,255,.07); border:1px solid rgba(255,224,174,.25); outline:none; border-radius:13px; font-size:16px; }
+    input:focus { border-color:rgba(255,205,127,.8); box-shadow:0 0 0 3px rgba(255,190,100,.1); }
+    button { border:0; cursor:pointer; color:#241407; background:linear-gradient(135deg,#ffe5aa,#ffb65b); border-radius:13px; padding:13px 19px; font-size:14px; font-weight:800; box-shadow:0 8px 28px rgba(255,158,61,.2); transition:transform .2s ease,filter .2s ease; }
+    button:hover { transform:translateY(-2px); filter:brightness(1.06); }
+    button,input { touch-action:manipulation; }
+    button:active { transform:translateY(0) scale(.98); }
+    .hint { color:#9291a7; font-size:11px; line-height:1.6; }
+    #hud { position:fixed; z-index:9; inset:0; pointer-events:none; opacity:0; transition:opacity .8s ease; }
+    #hud.visible { opacity:1; }
+    .hud-top { position:absolute; top:20px; left:22px; right:22px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .brand { color:rgba(255,230,190,.82); font-size:10px; text-transform:uppercase; letter-spacing:.2em; }
+    .countdown { display:flex; align-items:center; gap:9px; padding:7px 12px; border:1px solid rgba(140,190,255,.24); border-radius:999px; background:rgba(7,12,30,.68); color:#dceaff; box-shadow:0 0 24px rgba(66,139,220,.08); backdrop-filter:blur(10px); font-variant-numeric:tabular-nums; }
+    .countdown-label { color:rgba(180,207,240,.72); font-size:8px; letter-spacing:.17em; font-weight:700; }
+    #countdownValue { color:#e4efff; font-size:13px; letter-spacing:.08em; font-weight:800; min-width:42px; text-align:right; }
+    .countdown.complete { border-color:rgba(120,188,255,.48); box-shadow:0 0 28px rgba(75,150,245,.18); }
+    .countdown.complete .countdown-label { color:#9dcaff; }
+    .hud-actions { display:flex; gap:8px; pointer-events:auto; }
+    .ghost { background:rgba(9,12,29,.66); color:#f5dfbd; border:1px solid rgba(255,220,170,.22); box-shadow:none; padding:10px 13px; font-size:12px; backdrop-filter:blur(10px); }
+    .final-note { position:absolute; left:50%; bottom:clamp(25px,7vh,62px); transform:translateX(-50%); width:min(760px,calc(100% - 34px)); text-align:center; color:#eaf3ff; font-family:Georgia,serif; font-size:clamp(18px,3vw,25px); line-height:1.45; text-shadow:0 0 18px rgba(90,165,245,.38); opacity:0; transition:opacity 2s ease; }
+    .final-note.show { opacity:1; }
+    .toast { position:absolute; top:72px; left:50%; transform:translateX(-50%); color:#fff0d5; background:rgba(8,10,25,.78); border:1px solid rgba(255,220,170,.2); padding:9px 14px; border-radius:999px; font-size:11px; opacity:0; transition:opacity .3s ease; white-space:nowrap; }
+    .toast.show { opacity:1; }
+    #loading { position:fixed; inset:0; z-index:20; display:grid; place-items:center; color:#e9d7b8; background:#03040d; font-size:12px; letter-spacing:.15em; text-transform:uppercase; transition:opacity .5s ease; }
+    #error { display:none; position:fixed; z-index:30; inset:0; padding:26px; color:#fff; background:#080914; align-items:center; justify-content:center; text-align:center; line-height:1.6; }
+    @media(max-width:700px) {
+      #sceneCaption { top:calc(9vh + env(safe-area-inset-top)); width:88%; letter-spacing:.12em; font-size:10px; line-height:1.65; }
+      .intro-card { border-radius:22px; padding:25px 19px; }
+      .eyebrow { font-size:9px; letter-spacing:.18em; }
+      .sub { font-size:13px; line-height:1.6; margin-bottom:20px; }
+      .hint { font-size:10px; }
+      .hud-top { top:max(12px,env(safe-area-inset-top)); left:max(12px,env(safe-area-inset-left)); right:max(12px,env(safe-area-inset-right)); align-items:center; gap:6px; }
+      .brand { font-size:8px; max-width:82px; line-height:1.5; letter-spacing:.12em; }
+      .countdown { gap:0; padding:7px 9px; }
+      .countdown-label { display:none; }
+      #countdownValue { font-size:12px; min-width:38px; }
+      .hud-actions { gap:5px; }
+      .ghost { padding:9px 10px; font-size:10px; }
+      .ghost { min-height:44px; min-width:44px; padding:10px 11px; font-size:11px; touch-action:manipulation; }
+      .name-wrap { flex-direction:column; }
+      .name-wrap button { width:100%; min-height:46px; }
+      .final-note { bottom:max(22px,env(safe-area-inset-bottom)); width:calc(100% - 34px); font-size:clamp(14px,3.7vw,18px); }
+      .toast { top:calc(68px + env(safe-area-inset-top)); max-width:calc(100% - 28px); white-space:normal; text-align:center; }
+    }
+    @media(max-height:620px) and (max-width:900px) {
+      .screen { align-items:flex-start; }
+      .intro-card { margin:auto 0; padding:20px 18px; }
+      h1 { font-size:clamp(32px,7vh,48px); margin:10px 0 22px; }
+      .sub { margin-bottom:14px; }
+    }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important} }
+  </style>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/" } }
+  </script>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+  <div class="vignette"></div><div class="grain"></div>
+  <div id="cinematic-overlay"></div>
+  <div id="sceneCaption" aria-live="polite"></div>
+  <div id="loading">Preparing the passage between worlds…</div>
+  <div id="error"></div>
+
+  <section id="intro" class="screen">
+    <div class="intro-card">
+      <div class="eyebrow">HAPPY DIWALI</div>
+      <h1>Beyond the<br/>Event Horizon</h1>
+      <div class="name-wrap">
+        <input id="nameInput" maxlength="24" autocomplete="given-name" placeholder="Enter a person's name" aria-label="Person's name" />
+        <button id="launch">Begin the journey ✦</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="hud">
+    <div class="hud-top">
+      <div class="brand">A Diwali journey through space</div>
+      <div class="countdown" id="countdown" aria-label="Time remaining in the experience">
+        <span class="countdown-label" id="countdownLabel">TIME LEFT</span>
+        <strong id="countdownValue">00:53</strong>
+      </div>
+      <div class="hud-actions">
+        <button id="shareBtn" class="ghost">Share ↗</button>
+        <button id="restartBtn" class="ghost">Replay</button>
+      </div>
+    </div>
+    <div id="toast" class="toast">Your greeting is ready to share</div>
+    <div id="finalNote" class="final-note"><span id="finalGreeting">Happy Diwali!</span></div>
+  </div>
+
+  <script type="module">
+    let stage = 'loading Three.js modules';
+    function showFailure(err, where) {
+      const loading=document.getElementById('loading'), box=document.getElementById('error');
+      if(loading)loading.style.display='none'; if(!box)return;
+      box.style.display='flex';box.style.flexDirection='column';box.style.gap='12px';box.innerHTML='';
+      const title=document.createElement('h2');title.textContent='The 3D experience could not start';title.style.cssText='margin:0;color:#ffe2b3;font:500 25px Georgia,serif';
+      const intro=document.createElement('p');intro.textContent='The page could not initialise its 3D scene. Here is the specific failure:';intro.style.cssText='max-width:640px;margin:0;color:#d7d7e5';
+      const details=document.createElement('pre');details.textContent='Stage: '+(where||'unknown')+'\n'+(err?.stack||err?.message||String(err));details.style.cssText='max-width:min(760px,90vw);max-height:34vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;padding:14px;background:#111426;border:1px solid #39405e;border-radius:12px;color:#ffd99e;font:12px/1.5 ui-monospace,monospace';
+      const actions=document.createElement('div');actions.style.cssText='display:flex;gap:10px;flex-wrap:wrap;justify-content:center';
+      const copy=document.createElement('button');copy.textContent='Copy error details';copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(details.textContent);copy.textContent='Copied';}catch(_){copy.textContent='Select error text to copy';}});
+      const reload=document.createElement('button');reload.textContent='Reload page';reload.addEventListener('click',()=>location.reload());actions.append(copy,reload);box.append(title,intro,details,actions);
+    }
+
+    async function startExperience(){
+      try{
+        const THREE=await import('three');
+        const {OrbitControls}=await import('three/addons/controls/OrbitControls.js');
+        const {EffectComposer}=await import('three/addons/postprocessing/EffectComposer.js');
+        const {RenderPass}=await import('three/addons/postprocessing/RenderPass.js');
+        const {ShaderPass}=await import('three/addons/postprocessing/ShaderPass.js');
+        const {UnrealBloomPass}=await import('three/addons/postprocessing/UnrealBloomPass.js');
+        stage='preparing the experience';
+
+        const canvas=document.getElementById('scene'),intro=document.getElementById('intro'),hud=document.getElementById('hud');
+        const loading=document.getElementById('loading'),input=document.getElementById('nameInput'),toast=document.getElementById('toast');
+        const cinematicOverlay=document.getElementById('cinematic-overlay'),sceneCaption=document.getElementById('sceneCaption'),finalNote=document.getElementById('finalNote');
+        let displayName=(new URLSearchParams(location.search).get('name')||'').trim().slice(0,24);
+        input.value=displayName;
+        const initialFinalGreeting=document.getElementById('finalGreeting');if(initialFinalGreeting)initialFinalGreeting.textContent=displayName?`Happy Diwali, ${displayName}!`:'Happy Diwali!';
+        let renderer,composer,lensPass,bloomPass,scene,camera,controls;
+        let blackHoleGroup,wormholeGroup,interiorGroup,singularityGroup,arrivalGroup,starField,wormholeMaterial,wormholeStreaks,blackHoleDiskMaterial;
+        let interiorRings=[],singularityParticles;
+        let travelStars,travelStreaks,travelStarSpeeds,travelStarRand,greetingMesh,travelField;
+        let omMesh,omAura,omRings=[],omParticles,omSymbolGroup;
+        let fireworksGroup,fireworksPoints,fireworkPositions,fireworkColors,fireworkBaseColors,fireworkMeta=[],fireworkRand;
+        let sparklePoints,sparkleBaseColors,sparklePhases=[],sparkleClock=0,nebulaClouds=[],shootingStarsGroup,shootingStars=[];
+        let starDotTexture,warpStreaks,warpStreakGeometry,warpStreakBase=[],journeyWarpIntensity=0;
+        const sessionSeed=(Math.random()*0x100000000)>>>0;
+        const countdownEl=document.getElementById('countdown'),countdownLabel=document.getElementById('countdownLabel'),countdownValue=document.getElementById('countdownValue');
+        let lastCountdownSecond=-1;
+        let phase='idle',journeyStart=0,celebrationStart=0,celebrationCameraFrom=null,celebrationTargetFrom=null,journeySpeed=0;
+        let controlsEnabled=false;
+        const clock=new THREE.Clock();
+        const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const journeyDuration=reducedMotion?9000:32000;
+        const celebrationDuration=reducedMotion?9000:20500;
+        const totalDuration=journeyDuration+celebrationDuration;
+        function updateCountdown(now){
+          if(phase==='idle')return;
+          let elapsed=0;
+          if(phase==='journey')elapsed=now-journeyStart;
+          else if(phase==='celebration')elapsed=journeyDuration+(now-celebrationStart);
+          else elapsed=totalDuration;
+          const remaining=Math.max(0,totalDuration-elapsed),seconds=Math.ceil(remaining/1000);
+          if(seconds!==lastCountdownSecond||phase==='done'){
+            lastCountdownSecond=seconds;
+            countdownValue.textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+            if(phase==='done'){countdownLabel.textContent='COMPLETE';countdownEl.classList.add('complete');}
+            else{countdownLabel.textContent='TIME LEFT';countdownEl.classList.remove('complete');}
+          }
+        }
+
+        function seeded(seed){let x=seed>>>0;return()=>{x=(1664525*x+1013904223)>>>0;return x/4294967296;};}
+        function smooth(t){t=THREE.MathUtils.clamp(t,0,1);return t*t*(3-2*t);}
+        function setGroupOpacity(group,amount){
+          if(!group)return;amount=THREE.MathUtils.clamp(amount,0,1);group.visible=amount>.002;
+          group.traverse(obj=>{
+            if(obj.isPointLight){if(obj.userData.__fadeBaseIntensity===undefined)obj.userData.__fadeBaseIntensity=obj.intensity;obj.intensity=obj.userData.__fadeBaseIntensity*amount;}
+            if(!obj.material)return;
+            const materials=Array.isArray(obj.material)?obj.material:[obj.material];
+            for(const mat of materials){
+              if(mat.userData.__fadeBaseOpacity===undefined){mat.userData.__fadeBaseOpacity=mat.opacity??1;mat.userData.__fadeBaseTransparent=mat.transparent;mat.userData.__fadeBaseDepthWrite=mat.depthWrite;}
+              const nextTransparent=mat.userData.__fadeBaseTransparent||amount<.999;
+              if(mat.transparent!==nextTransparent){mat.transparent=nextTransparent;mat.needsUpdate=true;}
+              mat.opacity=mat.userData.__fadeBaseOpacity*amount;
+              mat.depthWrite=amount<.999?false:mat.userData.__fadeBaseDepthWrite;
+            }
+          });
+        }
+        function easeIn(t){t=THREE.MathUtils.clamp(t,0,1);return t*t*t;}
+        function setCaption(text,visible=true){if(sceneCaption.textContent!==text)sceneCaption.textContent=text;sceneCaption.classList.toggle('show',visible);}
+        function makeCanvasTexture(draw,w=1024,h=512){const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');draw(ctx,w,h);const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;tx.anisotropy=Math.min(8,renderer?.capabilities?.getMaxAnisotropy?.()||4);return tx;}
+        function createStarDotTexture(){
+          // A radial-alpha sprite keeps point stars circular instead of square pixels.
+          return makeCanvasTexture((ctx,w,h)=>{
+            const g=ctx.createRadialGradient(w*.5,h*.5,0,w*.5,h*.5,w*.49);
+            g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.18,'rgba(255,255,255,.96)');
+            g.addColorStop(.48,'rgba(255,255,255,.42)');g.addColorStop(.82,'rgba(255,255,255,.08)');g.addColorStop(1,'rgba(255,255,255,0)');
+            ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+          },64,64);
+        }
+
+        function addStarLayer(parent,count,minR,maxR,size,opacity,seed){
+          const rand=seeded(seed),positions=new Float32Array(count*3),colors=new Float32Array(count*3);
+          const palette=[new THREE.Color(0xc8d9ff),new THREE.Color(0xffffff),new THREE.Color(0xffe0ba),new THREE.Color(0x9db9ff),new THREE.Color(0xd5b9ff)];
+          for(let i=0;i<count;i++){const z=rand()*2-1,a=rand()*Math.PI*2,r=minR+Math.pow(rand(),.7)*(maxR-minR),q=Math.sqrt(1-z*z);positions[i*3]=r*q*Math.cos(a);positions[i*3+1]=r*q*Math.sin(a);positions[i*3+2]=r*z;const c=palette[Math.floor(rand()*palette.length)].clone().multiplyScalar(.65+rand()*.7);colors[i*3]=c.r;colors[i*3+1]=c.g;colors[i*3+2]=c.b;}
+          const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(positions,3));geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+          const mat=new THREE.PointsMaterial({map:starDotTexture,size,vertexColors:true,transparent:true,alphaTest:.015,opacity,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending});const p=new THREE.Points(geo,mat);parent.add(p);return p;
+        }
+        function addNebula(parent,center,spread,color,count,seed){
+          // Each cloud gets its own random-but-repeatable-this-run particle shape and a
+          // gentle drift, rather than all nebula points moving as one flat backdrop.
+          const rand=seeded(seed),positions=new Float32Array(count*3),colors=new Float32Array(count*3),base=new THREE.Color(color);
+          const gaussian=()=>{let u=0,v=0;while(u===0)u=rand();while(v===0)v=rand();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+          for(let i=0;i<count;i++){positions[i*3]=gaussian()*spread[0];positions[i*3+1]=gaussian()*spread[1];positions[i*3+2]=gaussian()*spread[2];const c=base.clone().multiplyScalar(.25+rand()*.9);colors[i*3]=c.r;colors[i*3+1]=c.g;colors[i*3+2]=c.b;}
+          const cloud=new THREE.Group();cloud.position.set(center[0],center[1],center[2]);
+          const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(positions,3));geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+          cloud.add(new THREE.Points(geo,new THREE.PointsMaterial({map:starDotTexture,size:1.05,vertexColors:true,transparent:true,alphaTest:.015,opacity:.12,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending})));
+          cloud.userData.basePosition=new THREE.Vector3(...center);cloud.userData.drift=rand()*Math.PI*2;parent.add(cloud);nebulaClouds.push(cloud);return cloud;
+        }
+        function createBackgroundSparkles(parent){
+          // Tiny stars twinkle independently; their starting positions vary each visit.
+          const count=520,positions=new Float32Array(count*3),colors=new Float32Array(count*3),rand=seeded(sessionSeed^0x51a7c3);
+          sparkleBaseColors=new Float32Array(count*3);sparklePhases=new Float32Array(count);
+          const palette=[0xffffff,0xc9e0ff,0xffe5c7,0x9fc8ff].map(v=>new THREE.Color(v));
+          for(let i=0;i<count;i++){
+            const z=-250-rand()*520,a=rand()*Math.PI*2,r=90+rand()*380;
+            positions[i*3]=Math.cos(a)*r;positions[i*3+1]=Math.sin(a)*r*.62;positions[i*3+2]=z;
+            const c=palette[Math.floor(rand()*palette.length)].clone().multiplyScalar(.45+rand()*.5);
+            sparkleBaseColors[i*3]=colors[i*3]=c.r;sparkleBaseColors[i*3+1]=colors[i*3+1]=c.g;sparkleBaseColors[i*3+2]=colors[i*3+2]=c.b;
+            sparklePhases[i]=rand()*Math.PI*2;
+          }
+          const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(positions,3));geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+          sparklePoints=new THREE.Points(geo,new THREE.PointsMaterial({map:starDotTexture,size:.38,vertexColors:true,transparent:true,alphaTest:.015,opacity:.78,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending}));parent.add(sparklePoints);
+        }
+        function updateBackgroundSparkles(dt,elapsed){
+          if(!sparklePoints)return;sparkleClock+=dt;if(sparkleClock<.075)return;sparkleClock=0;
+          const colors=sparklePoints.geometry.attributes.color.array;
+          for(let i=0;i<sparklePhases.length;i++){
+            const k=i*3,twinkle=.35+.65*(.5+.5*Math.sin(elapsed*(1.1+(i%7)*.23)+sparklePhases[i]));
+            colors[k]=sparkleBaseColors[k]*twinkle;colors[k+1]=sparkleBaseColors[k+1]*twinkle;colors[k+2]=sparkleBaseColors[k+2]*twinkle;
+          }
+          sparklePoints.geometry.attributes.color.needsUpdate=true;
+        }
+        function updateNebulaClouds(elapsed){
+          for(let i=0;i<nebulaClouds.length;i++){
+            const c=nebulaClouds[i],base=c.userData.basePosition,phase=c.userData.drift;
+            c.position.x=base.x+Math.sin(elapsed*.035+phase)*.48;
+            c.position.y=base.y+Math.cos(elapsed*.027+phase)*.32;
+            c.rotation.z=Math.sin(elapsed*.018+phase)*.025;
+          }
+        }
+        function createStarField(){
+          starField=new THREE.Group();scene.add(starField);
+          // The large-scale star layout remains composed and recognisable.
+          addStarLayer(starField,19000,150,780,.24,.82,11);
+          addStarLayer(starField,5200,65,360,.36,.58,22);
+          addStarLayer(starField,1500,35,170,.52,.44,33);
+          // Nebula shapes vary slightly per visit and drift slowly in the background.
+          addNebula(starField,[-115,42,-365],[54,31,55],0x5c4fb3,2300,sessionSeed^44);
+          addNebula(starField,[125,-32,-430],[70,38,60],0x315d9c,1900,sessionSeed^55);
+          addNebula(starField,[32,112,-520],[48,31,45],0xa34f87,1300,sessionSeed^66);
+          addNebula(starField,[-170,-90,-480],[58,36,48],0x9b6147,1200,sessionSeed^77);
+          createBackgroundSparkles(starField);
+        }
+
+        // A near-field star layer is attached to the camera, so the viewer sees
+        // themselves travelling through space rather than watching a static backdrop.
+        function createTravelField(){
+          const count=1850,positions=new Float32Array(count*3),colors=new Float32Array(count*3);
+          travelStarSpeeds=new Float32Array(count);travelStarRand=seeded(31991);
+          const palette=[0xffffff,0xc8ddff,0xffe4c5,0xb6c8ff,0xe1c8ff].map(c=>new THREE.Color(c));
+          const tanHalf=Math.tan(THREE.MathUtils.degToRad(camera.fov*.5));
+          function place(i,depth){
+            const d=depth??(9+travelStarRand()*235),halfH=d*tanHalf,halfW=halfH*camera.aspect;
+            positions[i*3]=(travelStarRand()*2-1)*halfW*1.18;
+            positions[i*3+1]=(travelStarRand()*2-1)*halfH*1.18;
+            positions[i*3+2]=-d;
+            if(depth===undefined)travelStarSpeeds[i]=.58+travelStarRand()*.82;
+            const c=palette[Math.floor(travelStarRand()*palette.length)].clone().multiplyScalar(.55+travelStarRand()*.62);
+            colors[i*3]=c.r;colors[i*3+1]=c.g;colors[i*3+2]=c.b;
+          }
+          for(let i=0;i<count;i++)place(i);
+          const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(positions,3));geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+          travelStars=new THREE.Points(geo,new THREE.PointsMaterial({map:starDotTexture,size:.43,vertexColors:true,transparent:true,alphaTest:.015,opacity:.72,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+          camera.add(travelStars);
+
+          const streakCount=620,streakPositions=new Float32Array(streakCount*6);
+          const streakGeo=new THREE.BufferGeometry();streakGeo.setAttribute('position',new THREE.Float32BufferAttribute(streakPositions,3));
+          travelStreaks=new THREE.LineSegments(streakGeo,new THREE.LineBasicMaterial({color:0xd9e7ff,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));
+          camera.add(travelStreaks);travelStars.visible=false;travelStreaks.visible=false;
+
+          // Radial warp streaks expand from the vanishing point as forward speed rises.
+          const warpCount=300,warpPositions=new Float32Array(warpCount*6),warpColors=new Float32Array(warpCount*6),warpRand=seeded(0x7f4a7c15);
+          warpStreakBase=[];
+          for(let i=0;i<warpCount;i++){
+            const angle=warpRand()*Math.PI*2,r=.10+Math.sqrt(warpRand())*.92,depth=24+warpRand()*68;
+            const halfH=depth*tanHalf,halfW=halfH*camera.aspect;
+            const x=Math.cos(angle)*r*halfW,y=Math.sin(angle)*r*halfH;
+            const c=palette[Math.floor(warpRand()*palette.length)].clone().multiplyScalar(.45+warpRand()*.45);
+            warpStreakBase.push({x,y,depth,inner:.10+warpRand()*.22,length:7+warpRand()*21});
+            const j=i*6;warpColors[j]=c.r;warpColors[j+1]=c.g;warpColors[j+2]=c.b;warpColors[j+3]=c.r;warpColors[j+4]=c.g;warpColors[j+5]=c.b;
+          }
+          const warpGeo=new THREE.BufferGeometry();warpGeo.setAttribute('position',new THREE.BufferAttribute(warpPositions,3).setUsage(THREE.DynamicDrawUsage));warpGeo.setAttribute('color',new THREE.Float32BufferAttribute(warpColors,3));
+          warpStreaks=new THREE.LineSegments(warpGeo,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:true}));
+          warpStreaks.position.z=-18;camera.add(warpStreaks);warpStreaks.visible=false;
+
+          function placeStar(i){
+            const d=150+travelStarRand()*105,halfH=d*tanHalf,halfW=halfH*camera.aspect;
+            positions[i*3]=(travelStarRand()*2-1)*halfW*1.18;positions[i*3+1]=(travelStarRand()*2-1)*halfH*1.18;positions[i*3+2]=-d;
+          }
+          function updateTravelStreakGeometry(length){
+            const a=travelStars?.geometry?.attributes?.position?.array;if(!a)return;
+            const out=travelStreaks.geometry.attributes.position.array;
+            for(let i=0;i<streakCount;i++){const j=i*3,k=i*6,z=a[j+2],x=a[j],y=a[j+1];out[k]=x;out[k+1]=y;out[k+2]=z;out[k+3]=x;out[k+4]=y;out[k+5]=z-length;}
+            travelStreaks.geometry.attributes.position.needsUpdate=true;
+          }
+          function updateWarpGeometry(intensity){
+            const out=warpGeo.attributes.position.array;
+            for(let i=0;i<warpCount;i++){
+              const b=warpStreakBase[i],j=i*6,expansion=THREE.MathUtils.clamp(intensity,0,1);
+              const inner=1-expansion*(.74+b.inner),x=b.x,y=b.y,z=-b.depth;
+              out[j]=x*inner;out[j+1]=y*inner;out[j+2]=z+2.2*expansion;
+              out[j+3]=x;out[j+4]=y;out[j+5]=z-b.length*expansion;
+            }
+            warpGeo.attributes.position.needsUpdate=true;
+            warpStreaks.material.opacity=.44*intensity;
+            warpStreaks.visible=intensity>.035;
+          }
+          return {
+            reset(){for(let i=0;i<count;i++)place(i,9+travelStarRand()*235);geo.attributes.position.needsUpdate=true;updateWarpGeometry(0);},
+            update(dt,speed,intensity=0){
+              const pos=geo.attributes.position.array;
+              for(let i=0;i<count;i++){const j=i*3;pos[j+2]+=speed*dt*travelStarSpeeds[i]*2.05;if(pos[j+2]>-2)placeStar(i);}
+              geo.attributes.position.needsUpdate=true;
+              const amount=THREE.MathUtils.clamp(intensity,0,1),streakLength=.55+amount*54;
+              travelStars.material.opacity=.52+amount*.42;
+              travelStreaks.material.opacity=.015+amount*.88;
+              updateTravelStreakGeometry(streakLength);updateWarpGeometry(amount);
+            },
+            show(){travelStars.visible=true;travelStreaks.visible=true;},
+            hide(){travelStars.visible=false;travelStreaks.visible=false;warpStreaks.visible=false;warpStreaks.material.opacity=0;}
+          };
+        }
+
+        function diskGeometry(inner,outer,radial=88,segments=520){
+          const positions=[],uvs=[],indices=[];
+          for(let r=0;r<=radial;r++){const v=r/radial,rr=inner+(outer-inner)*v;for(let i=0;i<=segments;i++){const u=i/segments,a=u*Math.PI*2;positions.push(Math.cos(a)*rr,Math.sin(a)*rr,Math.sin(a*3+v*19)*.025);uvs.push(u,v);}}
+          for(let r=0;r<radial;r++)for(let i=0;i<segments;i++){const a=r*(segments+1)+i,b=a+segments+1;indices.push(a,b,a+1,b,b+1,a+1);}
+          const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));geo.setIndex(indices);geo.computeVertexNormals();return geo;
+        }
+        function createBlackHole(){
+          blackHoleGroup=new THREE.Group();
+          const core=new THREE.Mesh(new THREE.SphereGeometry(4.55,96,96),new THREE.MeshBasicMaterial({color:0x000002}));blackHoleGroup.add(core);
+          const shadow=new THREE.Mesh(new THREE.SphereGeometry(4.9,72,72),new THREE.MeshBasicMaterial({color:0x03020a,transparent:true,opacity:.82,side:THREE.BackSide}));blackHoleGroup.add(shadow);
+          const diskGroup=new THREE.Group();diskGroup.rotation.set(1.12,.18,-.06);blackHoleGroup.add(diskGroup);
+          blackHoleDiskMaterial=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uOpacity:{value:1}},transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,
+            vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+            fragmentShader:`uniform float uTime;uniform float uOpacity;varying vec2 vUv;float h(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}float fb(vec2 p){float v=0.,a=.55;for(int i=0;i<5;i++){v+=a*n(p);p*=2.03;a*=.5;}return v;}void main(){float a=vUv.x*6.2831853,r=vUv.y;float swirl=a*5.-r*27.-uTime*1.8;float turb=fb(vec2(vUv.x*25.+uTime*.025,vUv.y*34.-uTime*.38));float fil=sin(swirl+turb*5.2)*.5+.5;float hot=clamp((1.-smoothstep(.02,.48,r))*.9+fil*.32+turb*.34,0.,1.);vec3 c=mix(vec3(.16,.018,.012),vec3(.72,.075,.018),smoothstep(.08,.55,hot));c=mix(c,vec3(1.,.39,.075),smoothstep(.42,.82,hot));c=mix(c,vec3(1.,.86,.61),smoothstep(.82,1.,hot));float dop=.44+.92*pow(max(0.,cos(a-.55)),2.);float alpha=(1.-smoothstep(.76,1.,r))*(.22+.72*fil)*uOpacity;gl_FragColor=vec4(c*dop*1.35,alpha);}`});
+          diskGroup.add(new THREE.Mesh(diskGeometry(4.75,13.2),blackHoleDiskMaterial));
+          const hot=new THREE.Mesh(new THREE.TorusGeometry(4.94,.12,18,320),new THREE.MeshBasicMaterial({color:0xffdca0,transparent:true,opacity:.94,blending:THREE.AdditiveBlending,depthWrite:false}));diskGroup.add(hot);
+          const outer=new THREE.Mesh(new THREE.TorusGeometry(8.9,.08,12,320),new THREE.MeshBasicMaterial({color:0xff823c,transparent:true,opacity:.47,blending:THREE.AdditiveBlending,depthWrite:false}));diskGroup.add(outer);
+          const photon=new THREE.Mesh(new THREE.TorusGeometry(4.96,.075,16,320),new THREE.MeshBasicMaterial({color:0xfff0cf,transparent:true,opacity:.98,blending:THREE.AdditiveBlending,depthWrite:false}));photon.rotation.x=1.12;blackHoleGroup.add(photon);
+          const lensArc=new THREE.Mesh(new THREE.TorusGeometry(5.55,.035,8,320,Math.PI*1.25),new THREE.MeshBasicMaterial({color:0xffbd77,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));lensArc.rotation.set(1.12,.3,.8);blackHoleGroup.add(lensArc);
+          const streakPositions=[];for(let i=0;i<180;i++){const z=Math.random()*2-1,a=Math.random()*Math.PI*2,r=24+Math.random()*100,v=new THREE.Vector3(Math.sqrt(1-z*z)*Math.cos(a),Math.sqrt(1-z*z)*Math.sin(a),z),len=.9+Math.random()*5.5;streakPositions.push(v.x*r,v.y*r,v.z*r,v.x*(r+len),v.y*(r+len),v.z*(r+len));}
+          const streakGeo=new THREE.BufferGeometry();streakGeo.setAttribute('position',new THREE.Float32BufferAttribute(streakPositions,3));const streakMat=new THREE.LineBasicMaterial({color:0xa8bcff,transparent:true,opacity:.055,blending:THREE.AdditiveBlending,depthWrite:false});blackHoleGroup.add(new THREE.LineSegments(streakGeo,streakMat));
+          const halo=new THREE.PointLight(0xffad5d,180,110,1.8);halo.position.set(0,0,5);blackHoleGroup.add(halo);
+          scene.add(blackHoleGroup);blackHoleGroup.userData={diskGroup,hot,outer,photon,lensArc,streakMat};
+        }
+
+        function createWormhole(){
+          wormholeGroup=new THREE.Group();wormholeGroup.visible=false;wormholeGroup.position.set(0,0,-198);scene.add(wormholeGroup);
+          // The throat is a little longer than before, with a more visible sequence
+          // of nested hoops so the viewer spends longer travelling through a tunnel.
+          const tunnelLength=270,halfTunnel=tunnelLength/2;
+          const geo=new THREE.CylinderGeometry(9.3,9.3,tunnelLength,160,192,true);geo.rotateX(Math.PI/2);
+          wormholeMaterial=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uOpacity:{value:0}},transparent:true,side:THREE.BackSide,depthWrite:false,blending:THREE.AdditiveBlending,
+            vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+            fragmentShader:`uniform float uTime;uniform float uOpacity;varying vec2 vUv;float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}void main(){float a=vUv.x*6.2831853,d=vUv.y;float q=n(vec2(a*6.+d*17.-uTime*.72,d*38.-uTime*1.9));float spiral=sin(a*11.+d*34.-uTime*5.8+q*4.5)*.5+.5;float filament=pow(max(0.,spiral),3.2);float pulse=.55+.45*sin(d*58.-uTime*7.5+a*3.);vec3 c=mix(vec3(.025,.012,.13),vec3(.10,.24,.68),smoothstep(.04,.78,q));c=mix(c,vec3(.48,.19,.72),smoothstep(.48,.96,spiral));c=mix(c,vec3(.68,.82,1.),smoothstep(.94,1.,filament));float alpha=(.17+q*.30+filament*.52)*pulse*uOpacity;gl_FragColor=vec4(c*(.72+filament*1.5),alpha);}`});
+          wormholeGroup.add(new THREE.Mesh(geo,wormholeMaterial));
+
+          // Alternating outer and inner hoops make the tunnel feel layered in depth.
+          const ringColors=[0x8c75ff,0x52b8ff,0xe4a3ff,0x86d8ff,0xffbdc9];
+          for(let i=0;i<25;i++){
+            const inner=i%3===1,radius=inner?6.65:8.22-i*.009;
+            const ring=new THREE.Mesh(new THREE.TorusGeometry(radius,.028+(i%4)*.012,8,176),new THREE.MeshBasicMaterial({color:ringColors[i%ringColors.length],transparent:true,opacity:inner?.22:.34,blending:THREE.AdditiveBlending,depthWrite:false}));
+            ring.position.z=halfTunnel-7-i*(tunnelLength-14)/24;
+            ring.rotation.set((i%5-2)*.035,(i%4-1.5)*.045,i*.23);
+            wormholeGroup.add(ring);
+          }
+
+          // Fine helical filaments run down the walls, giving the passage a clear
+          // forward direction and a stronger sense of travelling through its length.
+          const helixColors=[0x79baff,0xb19aff,0x8ee4ff];
+          for(let h=0;h<3;h++){
+            const points=[];
+            for(let j=0;j<=240;j++){
+              const t=j/240,angle=t*Math.PI*13+h*Math.PI*2/3;
+              const radius=8.86+.12*Math.sin(t*24+h);
+              points.push(new THREE.Vector3(Math.cos(angle)*radius,Math.sin(angle)*radius,halfTunnel- t*tunnelLength));
+            }
+            const curve=new THREE.CatmullRomCurve3(points);
+            const filament=new THREE.Mesh(new THREE.TubeGeometry(curve,420,.021,5,false),new THREE.MeshBasicMaterial({color:helixColors[h],transparent:true,opacity:.37,blending:THREE.AdditiveBlending,depthWrite:false}));
+            wormholeGroup.add(filament);
+          }
+
+          // A dark gravitational aperture remains visible at the far end.
+          const farCore=new THREE.Mesh(new THREE.SphereGeometry(6.1,72,64),new THREE.MeshBasicMaterial({color:0x000002}));farCore.position.z=-halfTunnel;wormholeGroup.add(farCore);
+          const farHalo=new THREE.Mesh(new THREE.TorusGeometry(6.55,.16,14,240),new THREE.MeshBasicMaterial({color:0xd9b7ff,transparent:true,opacity:.84,blending:THREE.AdditiveBlending,depthWrite:false}));farHalo.position.z=-halfTunnel;farHalo.rotation.x=.12;wormholeGroup.add(farHalo);
+          const farDisk=new THREE.Mesh(new THREE.TorusGeometry(7.25,.32,12,240),new THREE.MeshBasicMaterial({color:0x5b3f9b,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false}));farDisk.position.z=-halfTunnel;farDisk.rotation.x=.42;wormholeGroup.add(farDisk);
+
+          const count=2300,positions=new Float32Array(count*3),colors=new Float32Array(count*3);
+          for(let i=0;i<count;i++){
+            const a=Math.random()*Math.PI*2,r=1+Math.random()*7.2;
+            positions[i*3]=Math.cos(a)*r;positions[i*3+1]=Math.sin(a)*r;positions[i*3+2]=halfTunnel-Math.random()*tunnelLength;
+            const c=new THREE.Color().setHSL(.54+Math.random()*.28,.82,.62);colors[i*3]=c.r;colors[i*3+1]=c.g;colors[i*3+2]=c.b;
+          }
+          const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(positions,3));sg.setAttribute('color',new THREE.BufferAttribute(colors,3));
+          wormholeStreaks=new THREE.Points(sg,new THREE.PointsMaterial({map:starDotTexture,size:.44,vertexColors:true,transparent:true,alphaTest:.015,opacity:.92,blending:THREE.AdditiveBlending,depthWrite:false}));wormholeGroup.add(wormholeStreaks);
+          const mouth=new THREE.Mesh(new THREE.TorusGeometry(10.2,.28,16,260),new THREE.MeshBasicMaterial({color:0xa9a0ff,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false}));mouth.position.z=halfTunnel;wormholeGroup.add(mouth);
+        }
+
+        // A first-person interior passage: the camera physically travels through
+        // a narrowing spacetime funnel and reaches a tiny singularity before the wormhole.
+        function createInteriorFall(){
+          interiorGroup=new THREE.Group();interiorGroup.visible=false;interiorGroup.position.set(0,0,-44);scene.add(interiorGroup);
+          const shell=new THREE.Mesh(
+            new THREE.CylinderGeometry(13.2,1.7,72,88,32,true),
+            new THREE.MeshBasicMaterial({color:0x536fae,transparent:true,opacity:.075,wireframe:true,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending})
+          );shell.rotation.x=Math.PI/2;interiorGroup.add(shell);
+          // Concentric warped rings pass around the camera as it falls inward.
+          for(let i=0;i<13;i++){
+            const q=i/12,r=12.1-q*9.5;
+            const ring=new THREE.Mesh(new THREE.TorusGeometry(r,.035+(i%3)*.012,8,180),new THREE.MeshBasicMaterial({color:[0x5679c8,0x9a79d6,0x70c7ee,0xffad79][i%4],transparent:true,opacity:.16+q*.08,blending:THREE.AdditiveBlending,depthWrite:false}));
+            ring.position.z=34-i*5.55;ring.rotation.set(.06+q*.24,.12+q*.18,i*.17);interiorGroup.add(ring);interiorRings.push(ring);
+          }
+          singularityGroup=new THREE.Group();singularityGroup.position.set(0,0,-78);singularityGroup.visible=false;scene.add(singularityGroup);
+          const core=new THREE.Mesh(new THREE.SphereGeometry(1.05,48,40),new THREE.MeshBasicMaterial({color:0x000104}));singularityGroup.add(core);
+          const halo=new THREE.Mesh(new THREE.TorusGeometry(1.65,.055,10,180),new THREE.MeshBasicMaterial({color:0x9bcfff,transparent:true,opacity:.62,blending:THREE.AdditiveBlending,depthWrite:false}));halo.rotation.x=.28;singularityGroup.add(halo);
+          const ring2=new THREE.Mesh(new THREE.TorusGeometry(2.35,.035,8,180),new THREE.MeshBasicMaterial({color:0x6e82dc,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false}));ring2.rotation.set(1.04,.36,.2);singularityGroup.add(ring2);
+          const glow=new THREE.PointLight(0x7fbaff,18,24,2);singularityGroup.add(glow);
+          const n=620,pos=new Float32Array(n*3),col=new Float32Array(n*3),rand=seeded(80121);
+          for(let i=0;i<n;i++){
+            const a=rand()*Math.PI*2,r=2.8+rand()*7.5,z=(rand()-.5)*12;
+            pos[i*3]=Math.cos(a)*r;pos[i*3+1]=Math.sin(a)*r;pos[i*3+2]=z;
+            const c=new THREE.Color().setHSL(.57+rand()*.07,.72,.48+rand()*.22);col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
+          }
+          const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));pg.setAttribute('color',new THREE.BufferAttribute(col,3));
+          singularityParticles=new THREE.Points(pg,new THREE.PointsMaterial({size:.09,vertexColors:true,transparent:true,opacity:.72,depthWrite:false,blending:THREE.AdditiveBlending}));singularityGroup.add(singularityParticles);
+        }
+
+        function textTexture(lines){
+          return makeCanvasTexture((ctx,w,h)=>{
+            ctx.clearRect(0,0,w,h);ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(255,181,83,.96)';ctx.shadowBlur=38;
+            const grad=ctx.createLinearGradient(0,h*.16,0,h*.84);grad.addColorStop(0,'#fffbe8');grad.addColorStop(.48,'#ffd58b');grad.addColorStop(1,'#ffad4c');
+            ctx.fillStyle=grad;ctx.strokeStyle='rgba(117,57,17,.72)';ctx.lineWidth=5;
+            const drawFitted=(text,baseSize,maxWidth,y)=>{
+              let size=baseSize;ctx.font=`700 ${size}px Georgia, \"Times New Roman\", serif`;
+              while(size>54&&ctx.measureText(text).width>maxWidth){size-=4;ctx.font=`700 ${size}px Georgia, \"Times New Roman\", serif`;}
+              ctx.strokeText(text,w/2,y,maxWidth);ctx.fillText(text,w/2,y,maxWidth);
+            };
+            drawFitted(lines[0],178,w-170,h*.36);
+            ctx.shadowBlur=28;drawFitted(lines[1],150,w-190,h*.72);
+            ctx.shadowBlur=0;
+          },2048,640);
+        }
+        function omTexture(){
+          return makeCanvasTexture((ctx,w,h)=>{
+            ctx.clearRect(0,0,w,h);ctx.textAlign='center';ctx.textBaseline='middle';
+            ctx.shadowColor='#4c9fff';ctx.shadowBlur=26;ctx.lineJoin='round';ctx.lineWidth=10;ctx.strokeStyle='rgba(92,170,255,.42)';
+            // Browser font fallback uses a Devanagari-capable system font for the ॐ glyph.
+            ctx.font='700 720px "Noto Sans Devanagari", "Nirmala UI", "Mangal", "Arial Unicode MS", serif';
+            ctx.strokeText('ॐ',w/2,h*.53,850);
+            const grad=ctx.createLinearGradient(w*.25,h*.12,w*.76,h*.86);grad.addColorStop(0,'#d9f1ff');grad.addColorStop(.38,'#91cfff');grad.addColorStop(.72,'#4b96e8');grad.addColorStop(1,'#c3e6ff');
+            ctx.fillStyle=grad;ctx.fillText('ॐ',w/2,h*.53,850);
+            ctx.shadowBlur=0;ctx.lineWidth=2;ctx.strokeStyle='rgba(195,229,255,.58)';ctx.strokeText('ॐ',w/2,h*.53,850);
+          },1024,1024);
+        }
+        function letterTexture(char){
+          return makeCanvasTexture((ctx,w,h)=>{
+            ctx.clearRect(0,0,w,h);ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='700 190px Georgia,serif';ctx.shadowColor='#ffbb60';ctx.shadowBlur=30;
+            const g=ctx.createLinearGradient(0,35,0,h-20);g.addColorStop(0,'#fff8e0');g.addColorStop(.55,'#ffd58b');g.addColorStop(1,'#ffab42');ctx.fillStyle=g;ctx.fillText(char,w/2,h/2+4,210);
+          },256,256);
+        }
+        function buildArrival(){
+          arrivalGroup=new THREE.Group();arrivalGroup.position.set(0,0,-340);arrivalGroup.visible=false;scene.add(arrivalGroup);
+          omSymbolGroup=new THREE.Group();arrivalGroup.add(omSymbolGroup);
+          const auraTex=makeCanvasTexture((ctx,w,h)=>{const g=ctx.createRadialGradient(w/2,h/2,3,w/2,h/2,w*.48);g.addColorStop(0,'rgba(83,157,232,.18)');g.addColorStop(.34,'rgba(60,125,205,.075)');g.addColorStop(1,'rgba(42,105,190,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);},512,512);
+          omAura=new THREE.Mesh(new THREE.PlaneGeometry(34,34),new THREE.MeshBasicMaterial({map:auraTex,transparent:true,opacity:0,depthWrite:false,blending:THREE.NormalBlending}));omAura.position.z=-1;omSymbolGroup.add(omAura);
+          const omMat=new THREE.MeshBasicMaterial({map:omTexture(),transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide,blending:THREE.NormalBlending,toneMapped:false});
+          omMesh=new THREE.Mesh(new THREE.PlaneGeometry(22,22),omMat);omMesh.position.set(0,0,0);omSymbolGroup.add(omMesh);
+          for(let i=0;i<3;i++){const ring=new THREE.Mesh(new THREE.TorusGeometry(11.4+i*1.28,.035+(i===1?.025:0),8,240),new THREE.MeshBasicMaterial({color:[0x528fca,0x83b9ed,0x456faf][i],transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));ring.position.z=-.65-i*.12;ring.rotation.z=i*.18;omSymbolGroup.add(ring);omRings.push(ring);}
+          const pCount=1400,pPos=new Float32Array(pCount*3),pCol=new Float32Array(pCount*3),rand=seeded(sessionSeed^5544);
+          for(let i=0;i<pCount;i++){const a=rand()*Math.PI*2,r=9+rand()*7;pPos[i*3]=Math.cos(a)*r;pPos[i*3+1]=Math.sin(a)*r;pPos[i*3+2]=(rand()-.5)*5;const c=new THREE.Color().setHSL(.57+rand()*.065,.62,.58);pCol[i*3]=c.r;pCol[i*3+1]=c.g;pCol[i*3+2]=c.b;}
+          const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pPos,3));pg.setAttribute('color',new THREE.BufferAttribute(pCol,3));omParticles=new THREE.Points(pg,new THREE.PointsMaterial({size:.105,vertexColors:true,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));omSymbolGroup.add(omParticles);
+          createShootingStars(arrivalGroup);
+          resizeSymbolForViewport();
+        }
+        function createMeteorRibbon(parent, color, width, opacity, segments=18){
+          // A tapered triangle ribbon gives each meteor a soft, luminous tail rather
+          // than a uniform-width line. Vertex alpha fades smoothly toward the tail.
+          const vertexCount=(segments+1)*2,positions=new Float32Array(vertexCount*3),colors=new Float32Array(vertexCount*4),indices=[];
+          const c=new THREE.Color(color);
+          for(let i=0;i<=segments;i++){
+            const u=i/segments,brightness=.72+.28*(1-u),alpha=Math.pow(1-u,1.35);
+            for(let side=0;side<2;side++){
+              const k=(i*2+side)*4;colors[k]=c.r*brightness;colors[k+1]=c.g*brightness;colors[k+2]=c.b*brightness;colors[k+3]=alpha;
+            }
+            if(i<segments){const a=i*2,b=a+1,d=a+2,e=a+3;indices.push(a,b,d,b,e,d);}
+          }
+          const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(positions,3).setUsage(THREE.DynamicDrawUsage));geo.setAttribute('color',new THREE.BufferAttribute(colors,4).setUsage(THREE.DynamicDrawUsage));geo.setIndex(indices);
+          const mat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity,blending:THREE.AdditiveBlending,depthTest:true,depthWrite:false,side:THREE.DoubleSide,toneMapped:false});
+          const mesh=new THREE.Mesh(geo,mat);mesh.renderOrder=-10;parent.add(mesh);
+          return {mesh,geometry:geo,positions,colors,segments,width};
+        }
+        function meteorPosition(star,t){
+          const t2=t*t;
+          return {x:star.x+star.vx*t+.5*star.ax*t2,y:star.y+star.vy*t+.5*star.ay*t2,z:star.z};
+        }
+        function resetShootingStar(star,initial=false){
+          const rand=star.rand,dir=rand()<.5?1:-1;
+          // Fit the meteor paths to the actual viewport at the greeting's depth;
+          // this keeps them visible on narrow portrait phones as well as desktops.
+          const distance=78,halfHeight=distance*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5));
+          const halfWidth=halfHeight*camera.aspect;
+          star.boundsX=Math.max(5,halfWidth*.57);star.boundsY=Math.max(5,halfHeight*.78);
+          star.life=7.2+rand()*2.2;
+          star.x=-dir*(star.boundsX+2.5);
+          star.y=star.boundsY*(.08+rand()*.60);
+          star.z=-3-rand()*4;
+          star.vx=dir*(star.boundsX*2.15+rand()*3)/star.life;
+          star.vy=-(star.boundsY*(.20+rand()*.26))/star.life;
+          // A little acceleration bends the path like a meteor entering atmosphere.
+          star.ax=(rand()-.5)*.18;star.ay=-.025-rand()*.055;
+          star.trailDuration=.85+rand()*.55;star.width=.13+rand()*.09;
+          star.age=initial?-(rand()*6.5):-(3+rand()*8);
+          const palette=[0xeaf5ff,0xa8d6ff,0xffe5c3,0xcbbdff,0xb9f0ff];
+          star.tint=new THREE.Color(palette[Math.floor(rand()*palette.length)]);
+          // Give each meteor its own subtle tail hue; keep the central core nearly white.
+          for(const [ribbon,tint] of [[star.outer,star.tint],[star.core,new THREE.Color(0xf2f8ff)]]){
+            for(let k=0;k<ribbon.colors.length;k+=4){ribbon.colors[k]=tint.r;ribbon.colors[k+1]=tint.g;ribbon.colors[k+2]=tint.b;}
+            ribbon.geometry.attributes.color.needsUpdate=true;
+          }
+          star.glowHead.material.color.copy(star.tint);
+          star.glowHead.material.opacity=0;
+          star.coreHead.material.opacity=0;
+        }
+        function createShootingStars(parent){
+          shootingStarsGroup=new THREE.Group();
+          // Keep meteors on a distant background plane, behind the greeting, Om and fireworks.
+          shootingStarsGroup.position.z=-18;shootingStarsGroup.renderOrder=-10;parent.add(shootingStarsGroup);shootingStars=[];
+          const glowTexture=makeCanvasTexture((ctx,w,h)=>{
+            const g=ctx.createRadialGradient(w*.5,h*.5,1,w*.5,h*.5,w*.49);
+            g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.10,'rgba(236,247,255,.98)');g.addColorStop(.27,'rgba(143,202,255,.62)');g.addColorStop(.58,'rgba(91,160,255,.18)');g.addColorStop(1,'rgba(40,105,220,0)');
+            ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+          },128,128);
+          for(let i=0;i<4;i++){
+            const starGroup=new THREE.Group();starGroup.renderOrder=-10;shootingStarsGroup.add(starGroup);
+            const outer=createMeteorRibbon(starGroup,0x9fcaff,.72,.25),core=createMeteorRibbon(starGroup,0xeaf5ff,.18,.92);
+            const glowHead=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture,color:0xffffff,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthTest:true,depthWrite:false,toneMapped:false}));
+            glowHead.renderOrder=-10;glowHead.scale.set(1.7,1.7,1);starGroup.add(glowHead);
+            const coreHead=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture,color:0xffffff,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthTest:true,depthWrite:false,toneMapped:false}));
+            coreHead.renderOrder=-10;coreHead.scale.set(.52,.52,1);starGroup.add(coreHead);
+            const star={group:starGroup,outer,core,glowHead,coreHead,rand:seeded((sessionSeed^(0x9e3779b9*(i+1)))>>>0),x:0,y:0,z:-8,vx:0,vy:0,ax:0,ay:0,age:0,life:1.5,trailDuration:.4,width:.24,tint:new THREE.Color(0xffffff)};
+            shootingStars.push(star);resetShootingStar(star,true);
+          }
+        }
+        function updateMeteorRibbon(ribbon,star,age,fade){
+          const segs=ribbon.segments,halfWidth=ribbon.width,positions=ribbon.positions,colors=ribbon.colors;
+          for(let i=0;i<=segs;i++){
+            const u=i/segs,sampleAge=age-star.trailDuration*u,idx=i*2;
+            if(sampleAge<0){
+              const head=meteorPosition(star,age);
+              for(let side=0;side<2;side++){const p=(idx+side)*3;positions[p]=head.x;positions[p+1]=head.y;positions[p+2]=head.z;colors[(idx+side)*4+3]=0;}
+              continue;
+            }
+            const p=meteorPosition(star,sampleAge),tx=star.vx+star.ax*sampleAge,ty=star.vy+star.ay*sampleAge,speed=Math.max(.001,Math.hypot(tx,ty));
+            const nx=-ty/speed,ny=tx/speed,taper=.035+.965*Math.pow(1-u,.88),w=halfWidth*taper;
+            const alpha=fade*Math.pow(1-u,1.42);
+            for(let side=0;side<2;side++){
+              const sign=side===0?1:-1,k=(idx+side)*3,ck=(idx+side)*4;
+              positions[k]=p.x+nx*w*sign;positions[k+1]=p.y+ny*w*sign;positions[k+2]=p.z+.015;
+              colors[ck+3]=alpha;
+            }
+          }
+          ribbon.geometry.attributes.position.needsUpdate=true;ribbon.geometry.attributes.color.needsUpdate=true;
+          ribbon.geometry.computeBoundingSphere();
+        }
+        function updateShootingStars(dt){
+          if(!shootingStarsGroup)return;
+          for(const star of shootingStars){
+            star.age+=dt;
+            if(star.age>=star.life){resetShootingStar(star,false);star.glowHead.material.opacity=0;star.coreHead.material.opacity=0;continue;}
+            if(star.age<0){star.glowHead.material.opacity=0;star.coreHead.material.opacity=0;continue;}
+            const u=star.age/star.life,fade=Math.max(0,Math.min(1,star.age/.12,(1-u)*4.8)),head=meteorPosition(star,star.age);
+            updateMeteorRibbon(star.outer,star,star.age,fade);
+            updateMeteorRibbon(star.core,star,star.age,fade);
+            star.glowHead.position.set(head.x,head.y,head.z+.06);star.coreHead.position.set(head.x,head.y,head.z+.09);
+            star.glowHead.material.opacity=fade*.82;star.coreHead.material.opacity=fade*.98;
+            const pulse=1+.12*Math.sin(star.age*24);
+            star.glowHead.scale.set(1.75*pulse,1.75*pulse,1);star.coreHead.scale.set(.48*pulse,.48*pulse,1);
+          }
+        }
+        function reseedDiwaliFireworks(){
+          fireworkRand=seeded((Math.random()*0x100000000)>>>0);
+          const palette=[new THREE.Color(0xffc15c),new THREE.Color(0xffedbd),new THREE.Color(0x77caff),new THREE.Color(0xff8f55),new THREE.Color(0xd8a4ff)];
+          for(let i=0;i<fireworkMeta.length;i++){
+            resetDiwaliFirework(i,true);const c=palette[Math.floor(fireworkRand()*palette.length)];
+            fireworkColors[i*3]=c.r;fireworkColors[i*3+1]=c.g;fireworkColors[i*3+2]=c.b;
+          }
+          fireworkBaseColors=fireworkColors.slice();
+          if(fireworksPoints){fireworksPoints.geometry.attributes.color.needsUpdate=true;fireworksPoints.geometry.attributes.position.needsUpdate=true;}
+          shootingStars.forEach(star=>resetShootingStar(star,false));
+        }
+
+        function clearLetters(){
+          if(greetingMesh){arrivalGroup.remove(greetingMesh);greetingMesh.geometry.dispose();greetingMesh.material.map?.dispose();greetingMesh.material.dispose();greetingMesh=null;}
+        }
+        function buildGreetingLetters(){
+          clearLetters();
+          const lines=['HAPPY DIWALI',(displayName||'FRIEND').toUpperCase()];
+          const texture=textTexture(lines),material=new THREE.MeshBasicMaterial({map:texture,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,toneMapped:false});
+          const viewDistance=38;
+          const visibleWidth=2*viewDistance*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))*camera.aspect;
+          const planeWidth=Math.min(28,visibleWidth*.82),planeHeight=planeWidth/(2048/640);
+          greetingMesh=new THREE.Mesh(new THREE.PlaneGeometry(planeWidth,planeHeight),material);
+          // In front of Om: it will visibly travel deeper into the scene before being absorbed.
+          greetingMesh.position.set(0,0,16);arrivalGroup.add(greetingMesh);
+        }
+
+        const lensShader={uniforms:{tDiffuse:{value:null},uCenter:{value:new THREE.Vector2(.5,.5)},uRadius:{value:.22},uStrength:{value:0},uChromatic:{value:.0015}},
+          vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+          fragmentShader:`uniform sampler2D tDiffuse;uniform vec2 uCenter;uniform float uRadius;uniform float uStrength;uniform float uChromatic;varying vec2 vUv;void main(){vec2 dlt=vUv-uCenter;float d=length(dlt);vec2 dir=dlt/max(d,.0001);float field=exp(-d*d/(uRadius*uRadius*1.55));float bend=uStrength*field/(.34+d*1.8);vec2 uv=clamp(vUv+dir*bend,vec2(.001),vec2(.999));float ca=uChromatic*field;vec4 c;c.r=texture2D(tDiffuse,clamp(uv+dir*ca,vec2(.001),vec2(.999))).r;c.g=texture2D(tDiffuse,uv).g;c.b=texture2D(tDiffuse,clamp(uv-dir*ca,vec2(.001),vec2(.999))).b;c.a=1.;float ring=exp(-pow((d-uRadius*.49)/(uRadius*.045),2.))*uStrength*1.9;c.rgb+=vec3(1.,.61,.27)*ring;gl_FragColor=c;}`};
+
+        // Keep particle recycling in the same scope as the animation updater. In V5,
+        // reset() was nested inside createDiwaliFireworks(), so its later call from
+        // updateDiwaliFireworks() raised a ReferenceError after the first spark lifetime.
+        function resetDiwaliFirework(i,initial=false){
+          const type=i<78?0:i<190?1:i<286?2:i<360?3:4;
+          const side=fireworkRand()<.5?-1:1,meta={type,age:initial?fireworkRand()*1.2:0,life:0.9+fireworkRand()*.75,ox:0,oy:0,oz:0,vx:0,vy:0,vz:0,phase:fireworkRand()*Math.PI*2,side};
+          if(type===0){ // soaring rocket with a bright tail
+            meta.ox=side*(8.8+fireworkRand()*5.2);meta.oy=-8.7+fireworkRand()*2.4;meta.oz=fireworkRand()*2.4;
+            meta.vx=-side*(.35+fireworkRand()*.9);meta.vy=7.2+fireworkRand()*2.7;meta.vz=(fireworkRand()-.5)*1.6;meta.life=1.0+fireworkRand()*.35;
+          }else if(type===1){ // anar: continuous upward fan of sparks
+            meta.ox=side*(11.8+fireworkRand()*4.4);meta.oy=-7.8+fireworkRand()*2.1;meta.oz=fireworkRand()*3.0;
+            meta.vx=side*(.25+fireworkRand()*2.5);meta.vy=4.1+fireworkRand()*5.3;meta.vz=(fireworkRand()-.5)*2.4;meta.life=1.0+fireworkRand()*.65;
+          }else if(type===2){ // chakri: rotating circular spark wheel
+            meta.ox=side*(12.8+fireworkRand()*4.6);meta.oy=-2.2+fireworkRand()*4.4;meta.oz=fireworkRand()*2.2;meta.life=1.25+fireworkRand()*.45;
+          }else if(type===3){ // sussuri: a crackling, wavering spark trail
+            meta.ox=side*(11.8+fireworkRand()*5.2);meta.oy=-6.4+fireworkRand()*2.1;meta.oz=fireworkRand()*2.8;meta.vy=4.1+fireworkRand()*1.5;meta.vx=-side*(.15+fireworkRand()*.55);meta.life=1.0+fireworkRand()*.4;
+          }else{ // small aerial bursts above the greeting, away from the words
+            meta.ox=side*(7.8+fireworkRand()*6.4);meta.oy=3.8+fireworkRand()*4.0;meta.oz=fireworkRand()*2.8;
+            const a=fireworkRand()*Math.PI*2,el=(fireworkRand()-.5)*1.15,sp=2.2+fireworkRand()*4.8;
+            meta.vx=Math.cos(a)*Math.cos(el)*sp;meta.vy=Math.sin(a)*Math.cos(el)*sp;meta.vz=Math.sin(el)*sp;meta.life=.75+fireworkRand()*.55;
+          }
+          if(initial)meta.age=fireworkRand()*meta.life;
+          fireworkMeta[i]=meta;
+        }
+
+        // A quiet visual Diwali celebration around the greeting: rockets, anar fountains,
+        // chakri wheels and sizzling sparklers. These are visual effects only (no audio).
+        function createDiwaliFireworks(){
+          fireworksGroup=new THREE.Group();fireworksGroup.position.set(0,0,14.2);arrivalGroup.add(fireworksGroup);resizeFireworksForViewport();
+          const count=420;fireworkPositions=new Float32Array(count*3);fireworkColors=new Float32Array(count*3);fireworkRand=seeded(sessionSeed^912773);
+          const palette=[new THREE.Color(0xffc15c),new THREE.Color(0xffedbd),new THREE.Color(0x77caff),new THREE.Color(0xff8f55),new THREE.Color(0xd8a4ff)];
+          for(let i=0;i<count;i++){
+            resetDiwaliFirework(i,true);const c=palette[Math.floor(fireworkRand()*palette.length)].clone();
+            fireworkColors[i*3]=c.r;fireworkColors[i*3+1]=c.g;fireworkColors[i*3+2]=c.b;
+          }
+          fireworkBaseColors=fireworkColors.slice();
+          const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(fireworkPositions,3));geo.setAttribute('color',new THREE.BufferAttribute(fireworkColors,3));
+          fireworksPoints=new THREE.Points(geo,new THREE.PointsMaterial({size:.22,vertexColors:true,transparent:true,opacity:0,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending}));fireworksGroup.add(fireworksPoints);
+          updateDiwaliFireworks(0,0,false);
+        }
+        function updateDiwaliFireworks(dt,t,active=true){
+          if(!fireworksPoints)return;
+          fireworksGroup.visible=active&&t>.20&&t<.91;
+          const show=smooth((t-.20)/.10)*(1-smooth((t-.80)/.10));
+          fireworksPoints.material.opacity=.92*show;
+          if(!fireworksGroup.visible)return;
+          const pos=fireworksPoints.geometry.attributes.position.array;
+          for(let i=0;i<fireworkMeta.length;i++){
+            let m=fireworkMeta[i];m.age+=dt;
+            if(m.age>=m.life){resetDiwaliFirework(i,false);m=fireworkMeta[i];}
+            const a=m.age,u=a/m.life;let x=m.ox,y=m.oy,z=m.oz,fade=Math.max(0,1-u);
+            if(m.type===0){ // rockets arc upward and burst into a few bright sparks at their apex
+              x+=m.vx*a;y+=m.vy*a-1.65*a*a;z+=m.vz*a;
+              fade*=.9;
+            }else if(m.type===1){ // anar fountains spread out and fall under gravity
+              x+=m.vx*a;y+=m.vy*a-3.0*a*a;z+=m.vz*a;
+            }else if(m.type===2){ // chakri sparks rotate rapidly around a small wheel
+              const angle=m.phase+a*19.5,r=.65+u*2.25;
+              x+=Math.cos(angle)*r;y+=Math.sin(angle)*r;z+=Math.sin(angle*1.7)*.24;
+            }else if(m.type===3){ // sussuri crackles along a wavering upward path
+              x+=m.vx*a+Math.sin(a*17+m.phase)*.72;y+=m.vy*a-1.15*a*a;z+=Math.cos(a*14+m.phase)*.42;
+            }else{ // aerial sparkle bursts radiate outward
+              x+=m.vx*a;y+=m.vy*a-1.8*a*a;z+=m.vz*a;
+            }
+            const j=i*3;pos[j]=x;pos[j+1]=y;pos[j+2]=z;
+            const brighten=(m.type===0||m.type===4)?1.15:1;
+            // Recompute from the original hue each frame so sparks do not dim cumulatively.
+            const base=fireworkMeta[i].type===2?.9:1;
+            const c=base*fade*brighten;fireworkColors[j]=Math.min(2,fireworkBaseColors[j]*c);fireworkColors[j+1]=Math.min(2,fireworkBaseColors[j+1]*c);fireworkColors[j+2]=Math.min(2,fireworkBaseColors[j+2]*c);
+          }
+          fireworksPoints.geometry.attributes.position.needsUpdate=true;
+          fireworksPoints.geometry.attributes.color.needsUpdate=true;
+        }
+
+        function resizeFireworksForViewport(){
+          if(!fireworksGroup)return;
+          const horizontalFit=window.innerWidth<700?Math.max(.68,Math.min(1,window.innerWidth/430)):1;
+          fireworksGroup.scale.set(horizontalFit,1,1);
+        }
+        function resizeSymbolForViewport(){
+          if(!omSymbolGroup)return;
+          // Keep the outer rings and blue halo inside the narrower portrait viewport.
+          const portraitFit=Math.min(1,window.innerWidth/(window.innerHeight*.62));
+          omSymbolGroup.scale.setScalar(window.innerWidth<700?Math.max(.68,portraitFit):1);
+        }
+        function resizeGreetingForViewport(){
+          if(!greetingMesh||!camera)return;
+          const visibleWidth=2*38*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))*camera.aspect;
+          const width=Math.min(28,visibleWidth*.82);
+          greetingMesh.geometry.dispose();
+          greetingMesh.geometry=new THREE.PlaneGeometry(width,width/(2048/640));
+        }
+
+        function init(){
+          stage='checking WebGL 2 support';const webgl2=canvas.getContext('webgl2',{antialias:true,alpha:false,powerPreference:'high-performance'});if(!webgl2)throw new Error('WebGL 2 is unavailable. Enable graphics acceleration and update Chrome or the graphics driver.');
+          stage='creating the 3D renderer';renderer=new THREE.WebGLRenderer({canvas,context:webgl2,antialias:true,alpha:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,window.innerWidth<700?1.12:1.35));renderer.setSize(window.innerWidth,window.innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
+          scene=new THREE.Scene();scene.background=new THREE.Color(0x02030b);camera=new THREE.PerspectiveCamera(48,window.innerWidth/window.innerHeight,.1,1500);camera.position.set(0,0,68);scene.add(camera);
+          controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.045;controls.enablePan=false;controls.minDistance=22;controls.maxDistance=110;controls.enabled=false;controls.target.set(0,0,-340);
+          stage='building the starfield';starDotTexture=createStarDotTexture();createStarField();travelField=createTravelField();
+          stage='building the black hole';createBlackHole();
+          stage='building the wormhole';createWormhole();
+          stage='building the interior singularity passage';createInteriorFall();
+          stage='building the Om universe';buildArrival();buildGreetingLetters();createDiwaliFireworks();
+          scene.add(new THREE.AmbientLight(0x7181b8,.22));
+          stage='setting up cinematic post-processing';
+          try{composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));lensPass=new ShaderPass(lensShader);composer.addPass(lensPass);bloomPass=new UnrealBloomPass(new THREE.Vector2(window.innerWidth,window.innerHeight),window.innerWidth<700?.48:.8,.62,.12);composer.addPass(bloomPass);}
+          catch(e){console.warn('Post-processing unavailable; standard rendering will be used.',e);composer=null;lensPass=null;bloomPass=null;}
+          stage='starting the animation loop';window.addEventListener('resize',onResize);renderer.setAnimationLoop(animate);canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();showFailure(new Error('The graphics context was lost. Close other GPU-heavy tabs and reload.'),'rendering the 3D scene');});
+          loading.style.opacity='0';setTimeout(()=>loading.remove(),550);
+        }
+        function onResize(){if(!renderer)return;camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,window.innerWidth<700?1.12:1.35));renderer.setSize(window.innerWidth,window.innerHeight);composer?.setSize(window.innerWidth,window.innerHeight);bloomPass?.setSize(window.innerWidth,window.innerHeight);resizeGreetingForViewport();resizeSymbolForViewport();resizeFireworksForViewport();}
+        window.visualViewport?.addEventListener('resize',onResize);
+
+        function launch(){
+          if(phase!=='idle')return;displayName=(input.value||'Friend').trim().slice(0,24)||'Friend';
+          const url=new URL(location.href);url.searchParams.set('name',displayName);history.replaceState({},'',url);buildGreetingLetters();
+          const finalGreeting=document.getElementById('finalGreeting');if(finalGreeting)finalGreeting.textContent=`Happy Diwali, ${displayName}!`;
+          reseedDiwaliFireworks();
+          phase='journey';journeyStart=performance.now();lastCountdownSecond=-1;journeyWarpIntensity=0;countdownLabel.textContent='TIME LEFT';countdownEl.classList.remove('complete');countdownValue.textContent=`${String(Math.floor(Math.ceil(totalDuration/1000)/60)).padStart(2,'0')}:${String(Math.ceil(totalDuration/1000)%60).padStart(2,'0')}`;travelField.reset();travelField.show();starField.position.set(camera.position.x*.12,camera.position.y*.12,camera.position.z*.12);intro.classList.add('hidden');hud.classList.add('visible');finalNote.classList.remove('show');cinematicOverlay.style.opacity='0';setCaption('',false);
+        }
+        function beginCelebration(){
+          phase='celebration';celebrationStart=performance.now();
+          setGroupOpacity(blackHoleGroup,0);blackHoleDiskMaterial.uniforms.uOpacity.value=0;
+          setGroupOpacity(wormholeGroup,0);wormholeMaterial.uniforms.uOpacity.value=0;
+          setGroupOpacity(interiorGroup,0);setGroupOpacity(singularityGroup,0);travelField.hide();arrivalGroup.visible=true;
+          camera.position.set(0,0,-270);camera.lookAt(0,0,-340);celebrationCameraFrom=camera.position.clone();celebrationTargetFrom=new THREE.Vector3(0,0,-340);controls.target.copy(celebrationTargetFrom);controls.enabled=false;
+          omMesh.material.opacity=0;omMesh.scale.setScalar(.82);omAura.material.opacity=0;omRings.forEach(r=>r.material.opacity=0);omParticles.material.opacity=0;
+          greetingMesh.material.opacity=0;greetingMesh.position.set(0,0,16);greetingMesh.scale.setScalar(1);
+          cinematicOverlay.style.opacity='.16';setCaption('',false);
+        }
+        function updateJourney(now,dt){
+          const previousPosition=camera.position.clone();
+          const raw=Math.min(1,(now-journeyStart)/journeyDuration);
+          // One continuous exponential flight curve: it never eases to a stop at
+          // stage boundaries. The observer accelerates smoothly from deep space,
+          // through the horizon, into the interior, and onward through the wormhole.
+          const k=3.05,progress=(Math.exp(k*raw)-1)/(Math.exp(k)-1);
+          const z=68-338*progress;
+          const near=smooth((progress-.025)/.60);
+          const lateral=Math.sin(raw*10.8)*(.025+.38*near)+Math.sin(raw*24)*.08*near;
+          const vertical=Math.cos(raw*9.4)*(.02+.26*near)+Math.sin(raw*19.5)*.045*near;
+          camera.position.set(lateral,vertical,z);
+          camera.lookAt(lateral*.10+Math.sin(raw*8)*.10*near,vertical*.10+Math.cos(raw*7)*.07*near,z-38);
+          camera.rotateZ(Math.sin(raw*13.2)*.012*near);
+          camera.rotateX(Math.sin(raw*8.5)*.006*near);
+          journeySpeed=previousPosition.distanceTo(camera.position)/Math.max(dt,.001);
+
+          // A high-speed phase builds only after the horizon approach, then softens
+          // as the wormhole fills the view so the tunnel itself remains readable.
+          const speedFactor=smooth((journeySpeed-3.5)/25);
+          const flightWindow=smooth((raw-.36)/.16)*(1-smooth((raw-.91)/.075));
+          journeyWarpIntensity=THREE.MathUtils.clamp(speedFactor*flightWindow,0,1);
+          const blackHoleOpacity=1-smooth((raw-.43)/.27);
+          const interiorOpacity=smooth((raw-.515)/.17)*(1-smooth((raw-.855)/.13));
+          const singularityOpacity=smooth((raw-.675)/.09)*(1-smooth((raw-.805)/.095));
+          const wormholeOpacity=smooth((raw-.665)/.19)*(1-smooth((raw-.974)/.026));
+
+          // Each environment overlaps its neighbour. No group is switched on at a
+          // single frame: light, geometry and particles dissolve into the next world.
+          setGroupOpacity(blackHoleGroup,blackHoleOpacity);
+          blackHoleDiskMaterial.uniforms.uOpacity.value=blackHoleOpacity;
+          blackHoleGroup.userData.streakMat.opacity=.025+journeyWarpIntensity*.19;
+          setGroupOpacity(interiorGroup,interiorOpacity);
+          setGroupOpacity(singularityGroup,singularityOpacity);
+          setGroupOpacity(wormholeGroup,wormholeOpacity);
+          wormholeMaterial.uniforms.uOpacity.value=wormholeOpacity;
+          wormholeGroup.rotation.z+=dt*(.012+journeyWarpIntensity*.055);
+
+          // Let the distant universe drift relative to the moving observer. Near-field
+          // particles and radial warp streaks provide the stronger light-speed cue.
+          starField.position.set(camera.position.x*.12,camera.position.y*.12,camera.position.z*.12);
+          starField.rotation.y+=dt*(.0007+journeyWarpIntensity*.010);
+          starField.rotation.x+=dt*(.00012+journeyWarpIntensity*.002);
+
+          // Warm lensing around the black hole gradually cools into blue-violet
+          // distortion centred on the singularity and then the wormhole throat.
+          const bhScreen=blackHoleGroup.position.clone().project(camera);
+          const lensCenter=new THREE.Vector2(
+            THREE.MathUtils.clamp((bhScreen.x+1)*.5,.04,.96),
+            THREE.MathUtils.clamp((bhScreen.y+1)*.5,.04,.96)
+          );
+          const centerBlend=smooth((raw-.54)/.25);
+          lensCenter.lerp(new THREE.Vector2(.5,.5),centerBlend);
+          if(lensPass){
+            lensPass.uniforms.uCenter.value.copy(lensCenter);
+            lensPass.uniforms.uRadius.value=THREE.MathUtils.lerp(.11,.42,smooth((raw-.42)/.42));
+            const lensIn=smooth((raw-.24)/.28),lensPeak=smooth((raw-.56)/.18),lensOut=1-smooth((raw-.87)/.10);
+            lensPass.uniforms.uStrength.value=lensIn*(.11+.17*lensPeak)*lensOut;
+            lensPass.uniforms.uChromatic.value=(.001+.003*lensPeak)*lensIn*lensOut;
+          }
+
+          // A gentle colour wash, rather than a black screen, makes the surrounding
+          // universe visibly transform from warm accretion light to a cool wormhole.
+          const deepShift=smooth((raw-.53)/.33);
+          cinematicOverlay.style.background=`radial-gradient(ellipse at 50% 48%, rgba(${Math.round(26-13*deepShift)},${Math.round(24+9*deepShift)},${Math.round(62+48*deepShift)},.08), rgba(4,${Math.round(7+7*deepShift)},${Math.round(23+22*deepShift)},.32) 78%, rgba(1,2,12,.46))`;
+          cinematicOverlay.style.opacity=String(.10+.10*smooth((raw-.56)/.22));
+          if(raw>=1)beginCelebration();
+        }
+
+        function updateCelebration(now,dt){
+          const t=Math.min(1,(now-celebrationStart)/celebrationDuration);
+          // Settle the viewer after the wormhole exit; keep the greeting ahead of Om in depth.
+          const cameraT=smooth(Math.min(1,t/.16));camera.position.lerpVectors(celebrationCameraFrom,new THREE.Vector3(0,0,-286),cameraT);camera.lookAt(0,0,-340);
+
+          // First: the complete two-line greeting appears and remains readable on its own.
+          const greetingIn=smooth((t-.18)/.16);
+          const travel=smooth((t-.50)/.34);
+          greetingMesh.position.set(0,0,16-18*travel);
+          greetingMesh.scale.setScalar(1-.92*travel);
+          greetingMesh.material.opacity=greetingIn*(1-smooth((t-.78)/.09));
+
+          // Only after the greeting is visible does Om emerge behind it. As the words
+          // travel forward they shrink into the symbol and the symbol brightens.
+          const omIn=smooth((t-.59)/.25);
+          const mergeGlow=smooth((t-.78)/.12);
+          if(bloomPass)bloomPass.strength=THREE.MathUtils.lerp(window.innerWidth<700?.26:.42,window.innerWidth<700?.34:.54,mergeGlow);
+          omMesh.material.opacity=omIn*.94;omAura.material.opacity=omIn*(.38+.10*mergeGlow);
+          omRings.forEach((r,i)=>r.material.opacity=omIn*(i===1?.28:.34));
+          omParticles.material.opacity=omIn*.42;
+
+          cinematicOverlay.style.opacity=String(.16*(1-smooth(t/.24)));
+          starField.position.z=THREE.MathUtils.lerp(starField.position.z,0,dt*.5);
+          // Let the visual greeting speak for itself; no additional poetic captions.
+          setCaption('',false);
+
+          arrivalGroup.rotation.z=Math.sin((now-celebrationStart)*.00012)*.012;
+          const pulse=1+.018*Math.sin((now-celebrationStart)*.0024);
+          omMesh.scale.setScalar(THREE.MathUtils.lerp(.82,1,omIn)*pulse);
+          omAura.scale.setScalar(pulse*(1+mergeGlow*.10));
+          omRings.forEach((r,i)=>{r.rotation.z+=(i%2?-.0012:.0015);r.scale.setScalar(1+.012*Math.sin((now-celebrationStart)*.0018+i));});
+          omParticles.rotation.z+=.0015+mergeGlow*.002;
+          updateDiwaliFireworks(dt,t,true);
+          updateShootingStars(dt);
+          updateBackgroundSparkles(dt,clock.elapsedTime);
+          updateNebulaClouds(clock.elapsedTime);
+          starField.rotation.y+=.000025;
+          if(t>=.88)finalNote.classList.add('show');
+          if(t>=1){phase='done';fireworksGroup.visible=false;controls.enabled=true;setCaption('',false);updateCountdown(now);}
+        }
+        function animate(now){
+          const dt=Math.min(clock.getDelta(),.05),elapsed=clock.elapsedTime;
+          if(blackHoleGroup?.visible){blackHoleGroup.userData.diskGroup.rotation.z+=dt*(phase==='journey'?.18:.08);blackHoleGroup.userData.hot.rotation.z+=dt*.05;blackHoleGroup.userData.outer.rotation.z-=dt*.025;blackHoleGroup.userData.photon.rotation.z+=dt*.018;blackHoleDiskMaterial.uniforms.uTime.value=elapsed;}
+          if(wormholeGroup?.visible){wormholeMaterial.uniforms.uTime.value=elapsed;wormholeGroup.rotation.z+=dt*.018;if(wormholeStreaks){const arr=wormholeStreaks.geometry.attributes.position.array;for(let i=0;i<arr.length;i+=3){arr[i+2]+=dt*(phase==='journey'?58:18);if(arr[i+2]>135)arr[i+2]=-135;}wormholeStreaks.geometry.attributes.position.needsUpdate=true;}}
+          if(interiorGroup?.visible){interiorGroup.rotation.z+=dt*.014;interiorRings.forEach((r,i)=>{r.rotation.z+=(i%2?-.012:.009);r.rotation.x+=dt*.003;});if(singularityParticles)singularityParticles.rotation.z-=dt*.22;if(singularityGroup?.visible)singularityGroup.rotation.z+=dt*.12;}
+          if(starField&&phase!=='journey'){starField.rotation.y+=dt*.00016;starField.rotation.x+=dt*.00004;}
+          if(phase==='journey'){updateJourney(now||performance.now(),dt);travelField.update(dt,journeySpeed,journeyWarpIntensity);}
+          else if(phase==='celebration')updateCelebration(now||performance.now(),dt);
+          else if(phase==='done'){arrivalGroup.rotation.z=Math.sin(elapsed*.13)*.012;omParticles.rotation.z+=dt*.0012;omRings.forEach((r,i)=>r.rotation.z+=(i%2?-.001:.001));updateShootingStars(dt);updateBackgroundSparkles(dt,elapsed);updateNebulaClouds(elapsed);}
+          updateCountdown(now||performance.now());
+          if(controls?.enabled)controls.update();if(composer&&scene&&camera)composer.render();else if(renderer&&scene&&camera)renderer.render(scene,camera);
+        }
+        function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600);}
+        function share(){const url=new URL(location.href);url.searchParams.set('name',displayName||'Friend');if(!/^https?:$/.test(url.protocol)){showToast('Publish this page online first, then share its HTTPS link.');return;}const msg=`Happy Diwali, ${displayName||'Friend'}! ✨ ${url.toString()}`;window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');}
+        function restart(){phase='idle';lastCountdownSecond=-1;countdownEl.classList.remove('complete');countdownLabel.textContent='TIME LEFT';countdownValue.textContent='00:53';controls.enabled=false;travelField.hide();setGroupOpacity(blackHoleGroup,1);blackHoleGroup.scale.setScalar(1);blackHoleDiskMaterial.uniforms.uOpacity.value=1;setGroupOpacity(wormholeGroup,0);wormholeMaterial.uniforms.uOpacity.value=0;setGroupOpacity(interiorGroup,0);setGroupOpacity(singularityGroup,0);starField.position.set(0,0,0);journeyWarpIntensity=0;fireworksGroup.visible=false;arrivalGroup.visible=false;arrivalGroup.position.set(0,0,-340);cinematicOverlay.style.opacity='0';finalNote.classList.remove('show');hud.classList.remove('visible');intro.classList.remove('hidden');setCaption('',false);camera.position.set(0,0,68);camera.lookAt(0,0,0);controls.target.set(0,0,-340);blackHoleDiskMaterial.uniforms.uOpacity.value=1;blackHoleDiskMaterial.uniforms.uTime.value=0;omMesh.material.opacity=0;omMesh.scale.setScalar(.82);omAura.material.opacity=0;omRings.forEach(r=>r.material.opacity=0);omParticles.material.opacity=0;greetingMesh.material.opacity=0;greetingMesh.position.set(0,0,16);greetingMesh.scale.setScalar(1);}
+
+        document.getElementById('launch').addEventListener('click',launch);input.addEventListener('keydown',e=>{if(e.key==='Enter')launch();});document.getElementById('shareBtn').addEventListener('click',share);document.getElementById('restartBtn').addEventListener('click',restart);
+        init();
+      }catch(err){console.error('Diwali experience startup failed at '+stage,err);showFailure(err,stage);}
+    }
+    startExperience();
+  </script>
+</body>
+</html>
